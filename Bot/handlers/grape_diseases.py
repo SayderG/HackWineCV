@@ -2,16 +2,8 @@ from aiogram import Dispatcher
 from aiogram.types import Message, CallbackQuery
 
 from Bot.keyboards.inline.grape import grape_markup
-from Bot.misc.grape_texts import grate_ill_info
+from Bot.misc.grape_texts import grade_ill_info, grade_causes_info
 from leaves import get_leaves_predict
-
-
-async def grape_start(message: Message):
-    await message.answer("Виноград")
-
-
-async def get_prediction(message: Message):
-    await message.answer("Предсказание")
 
 
 async def get_image(message: Message):
@@ -29,12 +21,16 @@ async def get_image(message: Message):
 async def get_info(callback_query: CallbackQuery):
     labels = {0: 'Черной гнили', 1: 'Эске', 2: 'Здоровом ростении', 3: 'Листовой гнили'}
     pred = callback_query.data.split(":")[-1]
-    await callback_query.message.answer(f"Подробная информация о {labels[int(pred)]}")
-    await callback_query.message.answer(f"{grate_ill_info[int(pred)]}")
+    await callback_query.message.answer(f"Подробная информация о {labels[int(pred)]}\n{grade_ill_info[int(pred)]}")
+
+
+async def get_causes(callback_query: CallbackQuery):
+    labels = {0: 'Черной гнили', 1: 'Эски', 2: 'Здорового ростения', 3: 'Листовой гнили'}
+    pred = callback_query.data.split(":")[-1]
+    await callback_query.message.answer(f"Причины {labels[int(pred)]}\n{grade_causes_info[int(pred)]}")
 
 
 def register_grape(dp: Dispatcher):
-    dp.register_message_handler(grape_start, commands=["grape"], state="*")
-    dp.register_message_handler(get_prediction, commands=["get_prediction"], state="*")
     dp.register_message_handler(get_image, content_types=['photo'], state="*")
     dp.register_callback_query_handler(get_info, lambda c: c.data.startswith("get_add_info"), state="*")
+    dp.register_callback_query_handler(get_causes, lambda c: c.data.startswith("causes"), state="*")
